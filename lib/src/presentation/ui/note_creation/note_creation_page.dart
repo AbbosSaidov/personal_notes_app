@@ -26,23 +26,37 @@ class _NoteCreationPageState extends State<NoteCreationPage> {
     }
   }
 
-  void _saveNote() {
-    final newNote = Note(
-      _titleController.text,
-      _contentController.text,
-      DateTime.now(),
-    );
-    final notesBox = Hive.box<Note>('notes');
-    if (widget.note == null) {
-      // New Note
-      notesBox.add(newNote);
-    } else {
-      // Updating Existing Note
-      final noteIndex = notesBox.values.toList().indexOf(widget.note!);
-      notesBox.putAt(noteIndex, newNote);
+  void _saveNote() async {  // Mark this method as async since I'll be performing async operations
+    try {
+      final newNote = Note(
+        _titleController.text,
+        _contentController.text,
+        DateTime.now(),
+      );
+      final notesBox = await Hive.openBox<Note>('notes');  // Await the opening of the box
+
+      if (widget.note == null) {
+        // New Note
+        await notesBox.add(newNote);  // Await the add operation
+      } else {
+        // Updating Existing Note
+        final noteIndex = notesBox.values.toList().indexOf(widget.note!);
+        if (noteIndex != -1) {  // Check if the noteIndex is valid
+          await notesBox.putAt(noteIndex, newNote);  // Await the putAt operation
+        } else {
+          throw Exception('Note not found in the box');  // Throw an exception if noteIndex is invalid
+        }
+      }
+
+      Navigator.pop(context);
+    } catch (e) {
+      // a snackbar here to notify the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save the note: $e')),
+      );
     }
-    Navigator.pop(context);
   }
+
 
   @override
   Widget build(BuildContext context) {

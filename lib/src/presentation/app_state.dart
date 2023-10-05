@@ -5,7 +5,8 @@ part 'app_state.freezed.dart';
 
 class AppCubit extends Cubit<AppState> {
   AppCubit() : super(const AppState());
-  Future<void> changeMode() async {
+
+  void changeMode() async {
     emit(state.copyWith(isDarkMode: !state.isDarkMode));
   }
 }
