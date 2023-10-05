@@ -2,7 +2,6 @@
 
 A new Personal Notes App.
 
-## Getting Started
 
 Introducing "Personal Notes App," your new digital companion for jotting down thoughts, ideas, 
 and important information on the go. With our user-friendly interface, seamlessly create, edit, 
