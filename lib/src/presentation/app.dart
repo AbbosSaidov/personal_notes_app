@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:personal_notes_app/src/presentation/ui/home_page/home_page.dart';
 
-
-
 class App extends StatefulWidget {
-  const App();
+  const App({super.key});
 
   @override
   State<App> createState() => _AppState();
 }
 
 class _AppState extends State<App> {
-
   @override
   void initState() {
     super.initState();
@@ -25,11 +22,11 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return  ScreenUtilInit(
+    return ScreenUtilInit(
       designSize: const Size(363, 691),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (context , child) {
+      builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Personal Notes App',
@@ -40,7 +37,7 @@ class _AppState extends State<App> {
           home: child,
         );
       },
-      child: const HomePage(),
+      child: HomePage(),
     );
   }
 }
