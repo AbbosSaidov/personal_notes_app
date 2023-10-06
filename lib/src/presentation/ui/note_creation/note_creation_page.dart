@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:personal_notes_app/src/data/models/note/note_model.dart';
 
-import '../../utils/Colors.dart';
 
 class NoteCreationPage extends StatefulWidget {
-  final Note? note;
 
-  const NoteCreationPage({super.key, this.note});
+  const NoteCreationPage({super.key});
 
   @override
   _NoteCreationPageState createState() => _NoteCreationPageState();
@@ -18,14 +16,6 @@ class _NoteCreationPageState extends State<NoteCreationPage> {
   final _contentController = TextEditingController();
   DateTime _selectedDate = DateTime.now();  // Default to today's date
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.note != null) {
-      _titleController.text = widget.note!.title;
-      _contentController.text = widget.note!.content;
-    }
-  }
 
   void _saveNote() async {  // Mark this method as async since I'll be performing async operations
     try {
@@ -36,18 +26,7 @@ class _NoteCreationPageState extends State<NoteCreationPage> {
       );
       final notesBox = await Hive.openBox<Note>('notes');  // Await the opening of the box
 
-      if (widget.note == null) {
-        // New Note
-        await notesBox.add(newNote);  // Await the add operation
-      } else {
-        // Updating Existing Note
-        final noteIndex = notesBox.values.toList().indexOf(widget.note!);
-        if (noteIndex != -1) {  // Check if the noteIndex is valid
-          await notesBox.putAt(noteIndex, newNote);  // Await the putAt operation
-        } else {
-          throw Exception('Note not found in the box');  // Throw an exception if noteIndex is invalid
-        }
-      }
+      await notesBox.add(newNote);
 
       Navigator.pop(context);
     } catch (e) {
@@ -75,7 +54,7 @@ class _NoteCreationPageState extends State<NoteCreationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.note == null ? 'New Note' : 'Edit Note'),
+        title: const Text( 'New Note' ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

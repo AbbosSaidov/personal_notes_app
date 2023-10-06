@@ -3,24 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:personal_notes_app/src/data/models/note/note_model.dart';
 import 'package:personal_notes_app/src/presentation/app_state.dart';
-import 'package:personal_notes_app/src/presentation/ui/note_creation/note_creation_page.dart';
 import 'package:personal_notes_app/src/presentation/widgets/note_list_item.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key); // Corrected constructor
 
-  void _navigateToNoteCreationPage(BuildContext context) {
-    //  method for navigation
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const NoteCreationPage()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final appCubit = context.read<AppCubit>();
-
     final notesBox = Hive.box<Note>('notes'); // Error handling
 
     return Scaffold(
@@ -60,7 +50,7 @@ class HomePage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToNoteCreationPage(context), // Updated onPressed
+        onPressed: () => Navigator.pushNamed(context, '/create'), // Updated onPressed
         child: const Icon(Icons.add),
       ),
     );

@@ -12,9 +12,10 @@ class NoteListItem extends StatelessWidget {
     return InkWell(
       onTap: () {
         if (note != null) {
-          Navigator.push(
+          Navigator.pushNamed(
             context,
-            MaterialPageRoute(builder: (context) => NoteViewPage(note: note!)),
+            '/edit',
+            arguments: note,
           );
         }
       },
