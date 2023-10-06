@@ -64,10 +64,11 @@ class _NoteCreationPageState extends State<NoteCreationPage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate)
+    if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
       });
+    }
   }
 
   @override
@@ -87,19 +88,15 @@ class _NoteCreationPageState extends State<NoteCreationPage> {
             const SizedBox(height: 20),
             Text(
               "Selected date: ${_selectedDate.toLocal()}",
-              style: TextStyle(color: MyColors.blackText),
             ),
             TextFormField(
               controller: _titleController,
-              style: TextStyle(color: MyColors.blackText),
               decoration: InputDecoration(labelText: 'Title'),
             ),
             const SizedBox(height: 10),
             TextFormField(
-              style: TextStyle(color: MyColors.blackText),
               controller: _contentController,
               decoration: InputDecoration(labelText: 'Content'),
-              maxLines: 10,
             ),
             const SizedBox(height: 20),
             Row(
