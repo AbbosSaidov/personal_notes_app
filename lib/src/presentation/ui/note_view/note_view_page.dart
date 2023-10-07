@@ -1,84 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:personal_notes_app/src/data/models/note/note_model.dart';
 
+import 'cubit/note_view_cubit.dart';
+import 'cubit/note_view_state.dart';
 
-class NoteViewPage extends StatefulWidget {
+class NoteViewPage extends StatelessWidget {
   final Note note;
 
   const NoteViewPage({Key? key, required this.note}) : super(key: key);
 
   @override
-  _NoteViewPageState createState() => _NoteViewPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => NoteViewCubit(note),
+      child: const NoteViewPageView(),
+    );
+  }
 }
 
-class _NoteViewPageState extends State<NoteViewPage> {
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
-  DateTime? _selectedDate;
-  @override
-  void initState() {
-    super.initState();
-    _titleController.text = widget.note.title;
-    _contentController.text = widget.note.content;
-    _selectedDate = widget.note.creationDate;
-  }
-
-  void _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  void _updateNote() async {
-    final updatedNote = Note(
-      _titleController.text,
-      _contentController.text,
-      _selectedDate?? DateTime.now(), // Keep the original creation date
-    );
-
-    final notesBox = await Hive.openBox<Note>('notes');
-    final noteIndex = notesBox.values.toList().indexOf(widget.note);
-    if (noteIndex != -1) {
-      await notesBox.putAt(noteIndex, updatedNote);
-      Navigator.pop(context, updatedNote); // Optionally return the updated note
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Note not found')),
-      );
-    }
-  }
-
-  void _deleteNote() async {
-    final notesBox = await Hive.openBox<Note>('notes');
-    final noteIndex = notesBox.values.toList().indexOf(widget.note);
-    if (noteIndex != -1) {
-      await notesBox.deleteAt(noteIndex);
-      Navigator.pop(context); // Go back after deletion
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Note not found')),
-      );
-    }
-  }
+class NoteViewPageView extends StatelessWidget {
+  const NoteViewPageView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<NoteViewCubit>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Note'),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: _deleteNote,
+            icon: const Icon(Icons.delete),
+            onPressed: () => cubit.deleteNote(context),
           ),
         ],
       ),
@@ -87,40 +42,45 @@ class _NoteViewPageState extends State<NoteViewPage> {
         child: Column(
           children: [
             ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: Text("Select Date"),
+              onPressed: () => cubit.selectDate(context),
+              child: const Text("Select Date"),
             ),
             const SizedBox(height: 20),
-            Text(
-              "Selected date: $_selectedDate",
+            BlocBuilder<NoteViewCubit, NoteViewState>(
+              buildWhen: (previousState, currentState) =>
+                  previousState.date != currentState.date,
+              builder: (context, state) {
+                final formattedDate =
+                    DateFormat.yMMMd().format(state.date); // Format the date
+                return Text("Date: $formattedDate");
+              },
             ),
             TextField(
-              controller: _titleController,
-              decoration: InputDecoration(labelText: 'Title'),
+              controller: cubit.titleController,
+              decoration: const InputDecoration(labelText: 'Title'),
+              onChanged: (_) => cubit.updateTitle(),
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: _contentController,
-              decoration: InputDecoration(labelText: 'Content'),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Created on: ${widget.note.creationDate}',
+              controller: cubit.contentController,
+              decoration: const InputDecoration(labelText: 'Content'),
             ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: _updateNote,
-                  child: Text('Update'),
+                  onPressed: () {
+                    cubit.updateNote(context);
+                  },
+                  child: const Text('Update'),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Cancel'),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
                   ),
+                  child: const Text('Cancel'),
                 ),
               ],
             ),
