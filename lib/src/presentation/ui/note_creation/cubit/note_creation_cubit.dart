@@ -28,7 +28,6 @@ class NoteCreationCubit extends Cubit<NoteCreationState> {
         SnackBar(content: Text('Failed to save the note: $e')),
       );
     }
-    // You can access the text of the controllers with titleController.text and contentController.text
   }
 
   void selectDate(BuildContext context) async {
